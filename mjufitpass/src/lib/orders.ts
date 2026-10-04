@@ -1,6 +1,7 @@
 import "server-only";
 import { assessSlip } from "@/lib/payments/assess";
 import type { SlipVerifier } from "@/lib/payments/slip-verifier";
+import { ALL_DAY, devIgnoreHours } from "@/lib/clock";
 import { orderExpiresAt, salesStatus, type SalesStatus, type Settings } from "@/lib/sales";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { OrderStatus } from "@/lib/supabase/database.types";
@@ -59,6 +60,7 @@ export async function loadSalesContext(admin: Admin = createAdminClient()) {
     closeTime: row.close_time,
     salesCutoff: row.sales_cutoff,
     orderTtlMinutes: row.order_ttl_minutes,
+    ...(devIgnoreHours() ? ALL_DAY : {}),
   };
   return { settings, closedDates: closedResult.data.map((d) => d.date) };
 }

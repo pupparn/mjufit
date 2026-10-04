@@ -4,7 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AREA_PATHS } from "@/lib/auth/access";
 import { requireArea } from "@/lib/auth/viewer";
-import { appNow, clockOffsetMs } from "@/lib/clock";
+import { ALL_DAY, appNow, clockOffsetMs, devIgnoreHours } from "@/lib/clock";
 import { createClient } from "@/lib/supabase/server";
 import { ticketValidity } from "@/lib/tickets/validity";
 import { bangkokDate, hhmm } from "@/lib/time";
@@ -35,7 +35,7 @@ export default async function TicketPage() {
   if (settingsResult.error) throw new Error(`load settings: ${settingsResult.error.message}`);
 
   const ticket = ticketResult.data;
-  const closeTime = settingsResult.data.close_time;
+  const closeTime = devIgnoreHours() ? ALL_DAY.closeTime : settingsResult.data.close_time;
   const backLink = (
     <Link href={AREA_PATHS.student} className={buttonVariants({ variant: "outline", size: "lg" })}>
       {th.ticket.back}

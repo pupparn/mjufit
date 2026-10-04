@@ -17,8 +17,8 @@ Written 2026-10-04 at the end of a Windows session. Next session: **set up the r
 | 1 Auth + profile (Google login, PDPA consent, registration form, roles) | Done, used live |
 | 2 Purchase + payment (orders, PromptPay QR, Slip2Go/mock, realtime) | Done. Supabase has 1 paid order + 1 ticket from a real test |
 | 3 Ticket page `/ticket` with rotating TOTP QR + 6-digit backup code | Done, merged. **Not yet visually checked in a browser** |
-| **4 Gate Kiosk** | **Next** |
-| 5 Staff queue + staff/settings management | Not started |
+| 4 Gate Kiosk (`/kiosk`, `gate_scans` log, manual code) | Done, scanning verified live. Migration `20261004060000_gate_scans.sql` must be pushed (`npx supabase db push`) |
+| **5 Staff queue + staff/settings management** | **Next** |
 | 6 Dashboard | Not started (`/dashboard` is a placeholder) |
 | 7 Demo deploy (Vercel, mock) + Playwright E2E | Not started |
 
@@ -62,6 +62,8 @@ All 7 migrations in `mjufitpass/supabase/migrations/` are pushed to the remote S
 - SQL was verified ad hoc with PGlite (`@electric-sql/pglite`) using a stubbed `auth` schema. Those scripts lived in a Windows temp dir and are **not** in the repo. Recreate a harness if you need to test new migrations (no Docker was available, so there's no `supabase start`).
 
 ## Gotchas
+
+- Dev only: `DEV_IGNORE_HOURS=1` in `.env.local` ignores open/close/sales-cutoff on every device (restart dev server). The 🕒 dev clock is a per-browser cookie, so a mismatch between devices makes QR/backup codes fail as expired.
 
 - The `cn` import in `src/components/ui/*` is shadcn's own `cn` package (github.com/shadcn-ui/cn), not a typo.
 - Base UI `Button` must not render links. Style `<Link>` with `buttonVariants(...)` instead.

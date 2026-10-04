@@ -9,6 +9,7 @@ import {
   verifyGatePass,
   verifyManualCode,
 } from "./gate-pass";
+import { gateDecision } from "./gate-check";
 import { ticketValidity } from "./validity";
 
 const ticketId = "3f2b8c1e-9a4d-4e6f-8b7a-1c2d3e4f5a6b";
@@ -131,5 +132,24 @@ describe("ticketValidity", () => {
     expect(ticketValidity({ ...active, status: "cancelled" }, bkk("2026-10-05T09:00:00"), settings)).toBe(
       "cancelled",
     );
+  });
+});
+
+describe("gateDecision", () => {
+  const settings = { openTime: "08:00:00", closeTime: "20:00:00" };
+  const active = { status: "active" as const, businessDate: "2026-10-05" };
+  const at = (bangkok: string) => new Date(`2026-10-05T${bangkok}:00+07:00`);
+
+  it("lets an active ticket in during opening hours", () => {
+    expect(gateDecision(active, at("08:00"), settings)).toEqual({ ok: true });
+    expect(gateDecision(active, at("19:59"), settings)).toEqual({ ok: true });
+  });
+  it("rejects before open and after close", () => {
+    expect(gateDecision(active, at("07:59"), settings)).toEqual({ ok: false, reason: "before_open" });
+    expect(gateDecision(active, at("20:00"), settings)).toEqual({ ok: false, reason: "after_close" });
+  });
+  it("rejects cancelled and other-day tickets", () => {
+    expect(gateDecision({ ...active, status: "cancelled" }, at("10:00"), settings)).toEqual({ ok: false, reason: "cancelled" });
+    expect(gateDecision({ ...active, businessDate: "2026-10-04" }, at("10:00"), settings)).toEqual({ ok: false, reason: "not_today" });
   });
 });

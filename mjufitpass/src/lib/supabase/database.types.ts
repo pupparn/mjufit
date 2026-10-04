@@ -96,6 +96,27 @@ export type Database = {
         Update: { status?: TicketStatus };
         Relationships: [];
       };
+      gate_scans: {
+        Row: {
+          id: number;
+          ticket_id: string | null;
+          ok: boolean;
+          reason: string | null;
+          method: "qr" | "manual";
+          staff_email: string;
+          scanned_at: string;
+        };
+        Insert: {
+          ticket_id?: string | null;
+          ok: boolean;
+          reason?: string | null;
+          method: "qr" | "manual";
+          staff_email: string;
+          scanned_at: string;
+        };
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {

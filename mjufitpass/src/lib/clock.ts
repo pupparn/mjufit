@@ -20,3 +20,15 @@ export async function clockOffsetMs(): Promise<number> {
 export async function appNow(): Promise<Date> {
   return new Date(Date.now() + (await clockOffsetMs()));
 }
+
+/**
+ * Dev-only: set DEV_IGNORE_HOURS=1 in .env.local (then restart `npm run dev`)
+ * to treat opening hours, sales cutoff and closing time as always open — on
+ * every device, since it lives on the server. Never active in production.
+ */
+export function devIgnoreHours(): boolean {
+  return devClockEnabled() && process.env.DEV_IGNORE_HOURS === "1";
+}
+
+/** All-day hours for dev mode; "23:59" is the latest time the "HH:MM" comparisons can reach. */
+export const ALL_DAY = { openTime: "00:00", closeTime: "23:59", salesCutoff: "23:59" } as const;
