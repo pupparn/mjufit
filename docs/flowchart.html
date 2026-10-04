@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gym Day Pass Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#fafaf9; --fg:#1c1917; --muted:#57534e; --card:#ffffff; --line:#e7e5e4; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#1c1917; --fg:#f5f5f4; --muted:#a8a29e; --card:#292524; --line:#44403c; }
+  }
+  :root[data-theme="dark"] { --bg:#1c1917; --fg:#f5f5f4; --muted:#a8a29e; --card:#292524; --line:#44403c; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:"IBM Plex Sans Thai",system-ui,sans-serif; line-height:1.6; }
+  main { max-width:1100px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:1.6rem; margin:0 0 4px; }
+  .sub { color:var(--muted); margin:0 0 24px; }
+  nav { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+  nav a { color:var(--fg); text-decoration:none; border:1px solid var(--line); border-radius:999px; padding:4px 12px; font-size:.9rem; background:var(--card); }
+  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:24px; }
+  h2 { font-size:1.15rem; margin:0 0 4px; }
+  section p { color:var(--muted); margin:0 0 12px; font-size:.95rem; }
+  .diagram { overflow-x:auto; }
+  .mermaid { min-width:600px; text-align:center; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Gym Day Pass: Flowchart</h1>
+  <p class="sub">ระบบซื้อตั๋วฟิตเนสรายวันออนไลน์ ตาม spec ที่ตกลงกัน</p>
+  <nav>
+    <a href="#overview">1. ภาพรวม</a>
+    <a href="#onboard">2. ล็อกอินครั้งแรก</a>
+    <a href="#buy">3. ซื้อและชำระเงิน</a>
+    <a href="#staff">4. คิวของ staff</a>
+    <a href="#gate">5. สแกนเข้าประตู</a>
+  </nav>
+
+  <section id="overview">
+    <h2>1. ภาพรวมระบบ</h2>
+    <p>ผู้ใช้ 3 บทบาท ใช้ Next.js + Supabase ร่วมกัน</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart LR
+  S(["นักศึกษา<br/>(Gmail ใดก็ได้)"]) --> APP
+  ST(["Staff"]) --> APP
+  SA(["Super admin"]) --> APP
+  APP["Next.js App<br/>(Vercel)"] --> DB[("Supabase<br/>Postgres / Auth /<br/>Storage / Realtime")]
+  APP --> SV{{"SlipVerifier"}}
+  SV -->|SLIP_VERIFIER=slip2go| SOK["Slip2Go API"]
+  SV -->|SLIP_VERIFIER=mock| MOCK["Mock<br/>(เลือกผลเอง)"]
+  K["Gate Kiosk<br/>(/kiosk แท็บเล็ต)"] --> APP
+  ST -. ล็อกอินบน .-> K
+    </pre></div>
+  </section>
+
+  <section id="onboard">
+    <h2>2. ล็อกอินครั้งแรก</h2>
+    <p>ล็อกอินด้วย Google แล้วกำหนด role, ขอ consent และลงทะเบียนนักศึกษา</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+  A(["เข้าเว็บ"]) --> B["Login ด้วย Google"]
+  B --> C{"อีเมล = SUPER_ADMIN_EMAIL<br/>หรืออยู่ในรายชื่อ staff?"}
+  C -->|ใช่| D["role = super_admin / staff"] --> E(["หน้า Dashboard"])
+  C -->|ไม่ใช่| F{"เคยยอมรับ<br/>PDPA consent?"}
+  F -->|ยัง| G["แสดงหน้า consent"] --> H
+  F -->|แล้ว| H{"ลงทะเบียน<br/>แล้ว?"}
+  H -->|แล้ว| M(["หน้าหลักนักศึกษา"])
+  H -->|ยัง| I["กรอก รหัสนักศึกษา ชื่อ นามสกุล<br/>คณะ ชั้นปี"]
+  I --> J{"ข้อมูลครบ, รหัสตรง regex<br/>^\d{8,10}$ และไม่ซ้ำ?"}
+  J -->|ไม่| K["แจ้ง error ราย field"] --> I
+  J -->|ใช่| L["บันทึกและล็อกข้อมูล<br/>(แก้ได้โดย staff เท่านั้น)"] --> M
+    </pre></div>
+  </section>
+
+  <section id="buy">
+    <h2>3. ซื้อ Day Pass และชำระเงิน</h2>
+    <p>ซื้อได้เฉพาะวันนี้ 1 ใบต่อคน ราคา 20 บาท ขายถึง 19:30 และตั๋วหมดอายุ 20:00</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+  A(["กด 'ซื้อ Day Pass'"]) --> B{"วันปิดพิเศษ<br/>หรือเลย 19:30?"}
+  B -->|ใช่| X1(["ปิดการขาย"])
+  B -->|ไม่| C{"มีตั๋ววันนี้<br/>อยู่แล้ว?"}
+  C -->|ใช่| X2(["แสดงตั๋วเดิม"])
+  C -->|ไม่| D["สร้างออเดอร์ pending<br/>+ PromptPay QR ล็อกยอด 20 บาท"]
+  D --> E{"อัปโหลดสลิป<br/>ภายใน 15 นาที?"}
+  E -->|ไม่| X3(["ออเดอร์ expired"])
+  E -->|ใช่| F["SlipVerifier ตรวจ:<br/>ยอด = 20 · ผู้รับตรง<br/>โอนวันนี้ · transRef ไม่ซ้ำ"]
+  F --> G{"ผลการตรวจ"}
+  G -->|ผ่าน| H["ออกตั๋ว status = active<br/>+ สร้าง TOTP secret"]
+  G -->|ไม่ใช่สลิป / อ่านไม่ได้| U["แจ้งให้อัปโหลดใหม่<br/>(ออเดอร์เดิม)"] --> E
+  G -->|ไม่ผ่าน / API ล่ม| Q["เข้าคิว staff<br/>status = needs_review"]
+  Q --> R["ดู flow 4"]
+  H --> I(["นักศึกษาเห็นตั๋วและ QR แบบ realtime"])
+    </pre></div>
+  </section>
+
+  <section id="staff">
+    <h2>4. คิวของ staff (สลิปมีปัญหา / ยกเลิก / คืนเงิน)</h2>
+    <p>ทุกการกระทำบันทึกเหตุผลไว้ และคืนเงินนอกระบบ</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+  A(["Staff เปิดคิวสลิป"]) --> B["ดูสลิปและเหตุผลที่ตรวจไม่ผ่าน"]
+  B --> C{"ตัดสินใจ"}
+  C -->|อนุมัติ| D{"ตอนนี้เลย 20:00<br/>ของวันออเดอร์?"}
+  D -->|ไม่| E(["ออกตั๋ว active"])
+  D -->|ใช่| F["ตั๋ว expired ทันที<br/>+ ติดธง 'ต้องคืนเงิน'"]
+  C -->|ปฏิเสธ| G["ออเดอร์ rejected<br/>+ บันทึกเหตุผล"]
+  G --> H{"โอนเงินจริง?"}
+  H -->|ใช่| F
+  H -->|ไม่| Z(["จบ"])
+  F --> I["คืนเงินนอกระบบ"] --> J(["กด 'คืนเงินแล้ว' + หมายเหตุ"])
+  K(["Staff ยกเลิกตั๋ว active"]) --> L["status = cancelled<br/>+ บันทึกเหตุผล"] --> F
+    </pre></div>
+  </section>
+
+  <section id="gate">
+    <h2>5. สแกน QR ที่ Gate Kiosk</h2>
+    <p>QR แบบ TOTP เปลี่ยนทุก 30 วินาที สร้างบนมือถือได้แม้ไม่มีเน็ต และ server เป็นผู้ตรวจ</p>
+    <div class="diagram"><pre class="mermaid">
+flowchart TD
+  A(["นักศึกษาเปิดหน้าตั๋ว"]) --> B["มือถือสร้าง QR:<br/>ticketId + timeStep +<br/>HMAC(secret, timeStep)"]
+  B --> C["สแกนที่ Kiosk<br/>(หรือพิมพ์โค้ดสำรอง)"]
+  C --> D["Kiosk ส่งไป server<br/>(staff session)"]
+  D --> E{"HMAC ถูก และ<br/>timeStep อยู่ใน ±1?"}
+  E -->|ไม่| R1["QR ไม่ถูกต้อง / หมดเวลา"]
+  E -->|ใช่| F{"สถานะตั๋ว"}
+  F -->|cancelled| R2["ตั๋วถูกยกเลิก"]
+  F -->|expired / ไม่ใช่วันนี้| R3["ตั๋วหมดอายุ"]
+  F -->|active| G{"อยู่ในเวลาทำการ<br/>08:00–20:00?"}
+  G -->|ไม่| R4["นอกเวลาทำการ"]
+  G -->|ใช่| H["บันทึก entry log"] --> OK(["🟢 ประตูเปิด"])
+  R1 --> NO(["🔴 ปฏิเสธพร้อมเหตุผล"])
+  R2 --> NO
+  R3 --> NO
+  R4 --> NO
+    </pre></div>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  const dark = document.documentElement.dataset.theme === "dark" ||
+    (document.documentElement.dataset.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+  mermaid.initialize({ startOnLoad: true, theme: dark ? "dark" : "neutral", fontFamily: "IBM Plex Sans Thai, sans-serif", flowchart: { htmlLabels: true, curve: "basis" } });
+</script>
+</body>
+</html>
