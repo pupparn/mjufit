@@ -126,28 +126,41 @@ npm run lint && npm run typecheck && npm test && npm run build
 
 ## การมีส่วนร่วม: งานเอกสาร
 
-ทีมเอกสารรับผิดชอบเขียนคู่มือและอธิบายระบบ เอกสารใหม่ทั้งหมดอยู่ในโฟลเดอร์ `docs/`
+ทีมเอกสารรับผิดชอบจัดทำ **รายงานฉบับย่อ** ของโครงงาน ไฟล์หลักคือ `docs/report.md` ภาพหน้าจอเก็บใน `docs/images/`
 
-### เอกสารที่ต้องการ (ร่าง — ปรับได้)
+> รายงาน**ไม่ต้องใส่ Source Code** — อธิบายด้วยข้อความ ตาราง แผนภาพ และภาพหน้าจอแทน
 
-| เอกสาร | ไฟล์ | กลุ่มผู้อ่าน | ผู้รับผิดชอบ |
+### หัวข้อในรายงาน
+
+| # | หัวข้อ | แหล่งข้อมูลอ้างอิง | ผู้รับผิดชอบ |
 |---|---|---|---|
-| คู่มือนักศึกษา: ซื้อตั๋ว จ่ายเงิน ใช้ QR เข้าประตู | `docs/user-guide-student.md` | นักศึกษา | _TBD_ |
-| คู่มือเจ้าหน้าที่: คิวสลิป คืนเงิน Gate Kiosk Dashboard | `docs/user-guide-staff.md` | staff / super admin | _TBD_ |
-| ภาพรวมสถาปัตยกรรมและ database (ตาราง, RLS, RPC) | `docs/architecture.md` | นักพัฒนา | _TBD_ |
-| FAQ และการแก้ปัญหา (สลิปไม่ผ่าน, QR หมดอายุ, กล้องไม่ทำงาน) | `docs/faq.md` | ทุกคน | _TBD_ |
+| 1 | ชื่อโครงงานและรายชื่อสมาชิก | — | _TBD_ |
+| 2 | ที่มา แนวคิด หรือปัญหาที่ต้องการแก้ไข | [SPEC.md](mjufitpass/SPEC.md) (ย่อหน้าแรก) | _TBD_ |
+| 3 | วัตถุประสงค์ของโครงงาน | SPEC.md | _TBD_ |
+| 4 | กลุ่มผู้ใช้งานเป้าหมาย | SPEC.md §2 (นักศึกษา, staff, super admin) | _TBD_ |
+| 5 | ขอบเขตและความสามารถของระบบ | SPEC.md §2–6 และหัวข้อ "สิ่งที่ไม่ทำ" | _TBD_ |
+| 6 | เทคโนโลยีที่ใช้ | หัวข้อ [Tech stack](#tech-stack) ด้านบน, SPEC.md §1 | _TBD_ |
+| 7 | ภาพรวมโครงสร้างของระบบ | [โครงสร้าง repo](#โครงสร้าง-repo), `supabase/migrations/` (ตาราง) | _TBD_ |
+| 8 | Flow การทำงานที่สำคัญ | [docs/flowchart.html](docs/flowchart.html) | _TBD_ |
+| 9 | โครงสร้าง Function, Component, Module หรือ API ที่พัฒนา | [mjufitpass/README.md](mjufitpass/README.md) หัวข้อ "โครงสร้างหลัก" | _TBD_ |
+| 10 | ภาพหน้าจอพร้อมคำอธิบาย | เว็บจริง <https://mjufit.vercel.app> | _TBD_ |
+| 11 | URL ของระบบและ GitHub Repository | ด้านล่าง | _TBD_ |
+
+ข้อมูลสำหรับหัวข้อ 11:
+- URL ของระบบ: <https://mjufit.vercel.app>
+- GitHub: <https://github.com/pupparn/mjufit>
 
 ### ขั้นตอนการทำงาน
 
-1. เลือกเอกสารจากตารางด้านบน แล้วเปิด **Issue** บอกว่ากำลังทำอันไหน (กันทำซ้ำกัน)
-2. สร้าง branch จาก `master` ตั้งชื่อเช่น `docs/user-guide-student`
+1. เลือกหัวข้อจากตารางด้านบน แล้วเปิด **Issue** บอกว่ากำลังทำหัวข้อไหน (กันทำซ้ำกัน)
+2. สร้าง branch จาก `master` ตั้งชื่อเช่น `docs/report-flow`
    ```bash
-   git checkout -b docs/user-guide-student
+   git checkout -b docs/report-flow
    ```
-3. เขียนเอกสารเป็น Markdown ใน `docs/` (ภาพประกอบเก็บใน `docs/images/`)
+3. เขียนหัวข้อของตัวเองใน `docs/report.md` (แก้เฉพาะส่วนของตัวเองเพื่อลด merge conflict) ภาพประกอบเก็บใน `docs/images/`
 4. Commit แล้ว push branch ขึ้นไป
    ```bash
-   git push -u origin docs/user-guide-student
+   git push -u origin docs/report-flow
    ```
 5. เปิด **Pull Request** เข้า `master` แล้วขอ review จากเจ้าของโปรเจกต์อย่างน้อย 1 คน
 
@@ -157,7 +170,7 @@ npm run lint && npm run typecheck && npm test && npm run build
 - **ยึด [SPEC.md](mjufitpass/SPEC.md) และพฤติกรรมของเว็บจริง** ถ้าสองอย่างนี้ไม่ตรงกัน ให้แจ้งใน Issue แทนการเดาเอง
 - **ภาพหน้าจอห้ามมีข้อมูลส่วนบุคคลจริง** (ชื่อ รหัสนักศึกษา อีเมล รูปสลิป) — ใช้บัญชีทดสอบ หรือเบลอก่อน commit
 - **ห้ามใส่ secret ในเอกสาร** เช่น key ใน `.env.local` หรือเบอร์ PromptPay จริง
-- เอกสารแต่ละไฟล์ขึ้นต้นด้วยหัวข้อ, ผู้อ่านเป้าหมาย และวันที่อัปเดตล่าสุด
+- ภาพหน้าจอ (หัวข้อ 10) ใส่คำอธิบายใต้ภาพทุกภาพ ว่าเป็นหน้าอะไรและใช้ทำอะไร
 - ถ้าต้องอธิบาย flow ให้อ้างอิงหรือใช้ Mermaid แบบเดียวกับ [docs/flowchart.html](docs/flowchart.html)
 
 ## ข้อควรระวัง
