@@ -172,6 +172,12 @@ export const th = {
       slipSummary: (total: number, verified: number, failed: number) => `ตรวจ ${total} · ผ่าน ${verified} · ไม่ผ่าน ${failed}`,
       queueLink: (n: number) => `คิวสลิป (${n})`,
       note: "ยอดขายไม่รวมออเดอร์ที่คืนเงินแล้ว",
+      refundOwed: "เงินที่ยังต้องคืน",
+      refundCount: (n: number) => `${n} รายการ · ดูในคิวสลิป`,
+      byFaculty: "ตั๋วเดือนนี้ แยกตามคณะ",
+      byYear: "ตั๋วเดือนนี้ แยกตามชั้นปี",
+      year: (y: string) => `ปี ${y}`,
+      unknown: "ไม่ระบุ",
     },
     buyers: {
       title: "รายชื่อผู้ซื้อ",

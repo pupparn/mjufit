@@ -59,6 +59,16 @@ export function slipStats(subs: { verified: boolean; reason: string | null }[]) 
   return { total: subs.length, verified, failed: subs.length - verified, reasons };
 }
 
+/** Counts of each value, most common first; null/empty counted under `unknown`. */
+export function tally(values: (string | number | null)[], unknown: string): [string, number][] {
+  const counts = new Map<string, number>();
+  for (const v of values) {
+    const key = v === null || v === "" ? unknown : String(v);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+}
+
 /** RFC 4180 CSV. Cells starting with = + - @ are prefixed so spreadsheets don't run them as formulas. */
 export function toCsv(rows: (string | number | null)[][]): string {
   const cell = (v: string | number | null) => {

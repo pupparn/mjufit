@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, dailySales, entryHeatmap, salesTotals, slipStats, toCsv, weekStart } from "./stats";
+import { addDays, dailySales, entryHeatmap, salesTotals, slipStats, tally, toCsv, weekStart } from "./stats";
 
 describe("dates", () => {
   it("adds days across month and year ends", () => {
@@ -53,5 +53,11 @@ describe("slip stats", () => {
 describe("toCsv", () => {
   it("quotes and neutralises formulas", () => {
     expect(toCsv([["a,b", 'say "hi"', "=1+1", null, -5]])).toBe('"a,b","say ""hi""",\'=1+1,,-5\r\n');
+  });
+});
+
+describe("tally", () => {
+  it("sorts by count then name and buckets missing values", () => {
+    expect(tally(["b", "a", "b", null, ""], "?")).toEqual([["?", 2], ["b", 2], ["a", 1]]);
   });
 });
