@@ -4,6 +4,16 @@
 export type StaffRole = "staff" | "super_admin";
 export type OrderStatus = "pending_payment" | "paid" | "needs_review" | "rejected" | "expired";
 export type TicketStatus = "active" | "cancelled";
+export type StaffActionType =
+  | "approve_order"
+  | "reject_order"
+  | "cancel_ticket"
+  | "mark_refunded"
+  | "add_staff"
+  | "remove_staff"
+  | "update_settings"
+  | "add_closed_date"
+  | "remove_closed_date";
 type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
@@ -68,6 +78,8 @@ export type Database = {
           amount_satang: number;
           status: OrderStatus;
           review_reason: string | null;
+          refund_required: boolean;
+          refunded_at: string | null;
           expires_at: string;
           created_at: string;
           updated_at: string;
@@ -94,6 +106,36 @@ export type Database = {
         };
         Insert: never;
         Update: { status?: TicketStatus };
+        Relationships: [];
+      };
+      slip_submissions: {
+        Row: {
+          id: string;
+          order_id: string;
+          storage_path: string;
+          verifier: string;
+          verified: boolean;
+          reason: string | null;
+          trans_ref: string | null;
+          amount_satang: number | null;
+          transferred_at: string | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      staff_actions: {
+        Row: {
+          id: number;
+          staff_email: string;
+          action: StaffActionType;
+          order_id: string | null;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: { staff_email: string; action: StaffActionType; order_id?: string | null; note?: string | null };
+        Update: never;
         Relationships: [];
       };
       gate_scans: {
@@ -130,6 +172,18 @@ export type Database = {
           p_faculty: string;
           p_year_of_study: number;
         };
+        Returns: undefined;
+      };
+      staff_review_order: {
+        Args: { p_order_id: string; p_approve: boolean; p_refund: boolean; p_note: string; p_staff_email: string };
+        Returns: undefined;
+      };
+      staff_cancel_ticket: {
+        Args: { p_order_id: string; p_refund: boolean; p_note: string; p_staff_email: string };
+        Returns: undefined;
+      };
+      staff_mark_refunded: {
+        Args: { p_order_id: string; p_note: string; p_staff_email: string };
         Returns: undefined;
       };
       record_slip_result: {

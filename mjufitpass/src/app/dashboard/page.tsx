@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { SignOutButton } from "@/components/sign-out-button";
+import { buttonVariants } from "@/components/ui/button";
 import { requireArea } from "@/lib/auth/viewer";
 import { th } from "@/messages/th";
 
@@ -19,6 +21,24 @@ export default async function DashboardPage() {
           <SignOutButton />
         </div>
       </header>
+      <nav className="flex flex-wrap gap-2">
+        <Link href="/dashboard/queue" className={buttonVariants()}>
+          {th.staff.nav.queue}
+        </Link>
+        <Link href="/kiosk" className={buttonVariants({ variant: "outline" })}>
+          {th.staff.nav.kiosk}
+        </Link>
+        {viewer.role === "super_admin" && (
+          <>
+            <Link href="/dashboard/staff" className={buttonVariants({ variant: "outline" })}>
+              {th.staff.nav.staff}
+            </Link>
+            <Link href="/dashboard/settings" className={buttonVariants({ variant: "outline" })}>
+              {th.staff.nav.settings}
+            </Link>
+          </>
+        )}
+      </nav>
       <p className="text-muted-foreground">{th.staff.comingSoon}</p>
     </main>
   );

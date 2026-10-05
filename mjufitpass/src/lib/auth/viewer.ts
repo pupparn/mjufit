@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { redirectFor, type Area, type Viewer } from "./access";
+import { AREA_PATHS, redirectFor, type Area, type Viewer } from "./access";
 
 /** The current viewer, resolved once per request. */
 export const getViewer = cache(async (): Promise<Viewer> => {
@@ -51,5 +51,13 @@ export async function requireArea<A extends Area>(area: A): Promise<Viewer> {
   const viewer = await getViewer();
   const target = redirectFor(viewer, area);
   if (target) redirect(target);
+  return viewer;
+}
+
+/** Staff area, super admins only; plain staff go back to the dashboard. */
+export async function requireSuperAdmin(): Promise<Extract<Viewer, { kind: "staff" }>> {
+  const viewer = await requireArea("staff");
+  if (viewer.kind !== "staff") redirect(AREA_PATHS.login);
+  if (viewer.role !== "super_admin") redirect(AREA_PATHS.staff);
   return viewer;
 }
