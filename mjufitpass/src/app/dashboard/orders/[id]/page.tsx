@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireArea } from "@/lib/auth/viewer";
 import { formatBaht } from "@/lib/sales";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { bangkokDate, bangkokTime } from "@/lib/time";
 import { th } from "@/messages/th";
 import { OrderActionsForm } from "./order-actions-form";
 
@@ -58,7 +59,7 @@ export default async function StaffOrderPage({ params }: { params: Promise<{ id:
             </p>
           )}
           {refundDue && <p className="font-medium text-destructive">{t.refundDue}</p>}
-          {order.refunded_at && <p>{t.refunded(order.refunded_at.slice(0, 10))}</p>}
+          {order.refunded_at && <p>{t.refunded(bangkokDate(new Date(order.refunded_at)))}</p>}
         </CardContent>
       </Card>
 
@@ -98,7 +99,7 @@ export default async function StaffOrderPage({ params }: { params: Promise<{ id:
           <CardContent className="flex flex-col gap-2 text-sm">
             {history.data.map((h, i) => (
               <p key={i}>
-                {h.created_at.slice(0, 16).replace("T", " ")} · {t.actions[h.action]} · {h.staff_email} — {h.note}
+                {bangkokDate(new Date(h.created_at))} {bangkokTime(new Date(h.created_at))} · {t.actions[h.action]} · {h.staff_email} — {h.note}
               </p>
             ))}
           </CardContent>

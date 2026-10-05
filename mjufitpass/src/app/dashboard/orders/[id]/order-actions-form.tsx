@@ -11,6 +11,7 @@ export type AvailableActions = { review: boolean; cancel: boolean; refund: boole
 export function OrderActionsForm({ orderId, available }: { orderId: string; available: AvailableActions }) {
   const [state, formAction, pending] = useActionState(orderAction.bind(null, orderId), { error: null } as OrderActionState);
   const t = th.staff.order;
+  if (!available.review && !available.cancel && !available.refund) return null;
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
