@@ -86,6 +86,11 @@ npm run dev
 | `npm run lint` | ESLint |
 | `npm run build` | production build (ไม่ต้องมี env จริง) |
 | `npm run seed` | ตั้ง super admin จาก `SUPER_ADMIN_EMAIL` |
+| `npm run test:e2e` | E2E (Playwright) กับ Supabase local — ต้อง `npx supabase start` ก่อน (ต้องมี Docker) |
+
+E2E รัน `next dev` แยกที่ port 3100 (`.next-e2e/`) ด้วย `SLIP_VERIFIER=mock` และชี้ไป Supabase local เท่านั้น
+(`e2e/local-supabase.ts` ปฏิเสธ URL ที่ไม่ใช่ localhost) ล็อกอินผ่าน `/auth/dev-login` ซึ่งใช้ได้เฉพาะ `next dev` + `E2E_TEST_LOGIN=1`
+ครั้งแรกต้อง `npx playwright install chromium`
 
 ## โครงสร้างหลัก
 
