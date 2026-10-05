@@ -18,8 +18,8 @@ Written 2026-10-04 at the end of a Windows session. Next session: **set up the r
 | 2 Purchase + payment (orders, PromptPay QR, Slip2Go/mock, realtime) | Done. Supabase has 1 paid order + 1 ticket from a real test |
 | 3 Ticket page `/ticket` with rotating TOTP QR + 6-digit backup code | Done, merged. **Not yet visually checked in a browser** |
 | 4 Gate Kiosk (`/kiosk`, `gate_scans` log, manual code) | Done, scanning verified live. Migration `20261004060000_gate_scans.sql` must be pushed (`npx supabase db push`) |
-| **5 Staff queue + staff/settings management** | **Next** |
-| 6 Dashboard | Not started (`/dashboard` is a placeholder) |
+| 5 Staff queue + staff/settings management | Done, migration pushed. RPCs tested in PGlite; pages not yet clicked through logged in |
+| 6 Dashboard (stats, heatmap, buyers + CSV, slip stats) | Done in code; not yet viewed logged in |
 | 7 Demo deploy (Vercel, mock) + Playwright E2E | Not started |
 
 All 7 migrations in `mjufitpass/supabase/migrations/` are pushed to the remote Supabase project. Settings were changed live: `sales_cutoff` is now **19:00** (the spec default is 19:30).
