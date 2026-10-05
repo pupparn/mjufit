@@ -1,7 +1,9 @@
 import { getViewer } from "@/lib/auth/viewer";
+import { appNow } from "@/lib/clock";
 import { loadBuyers } from "@/lib/buyers";
 import { formatBaht } from "@/lib/sales";
 import { toCsv } from "@/lib/stats";
+import { bangkokDate, bangkokTime } from "@/lib/time";
 import { th } from "@/messages/th";
 
 export async function GET(request: Request) {
@@ -23,11 +25,13 @@ export async function GET(request: Request) {
       r.refunded_at ? "คืนแล้ว" : r.refund_required ? "รอคืน" : "",
     ]),
   ]);
+  const now = await appNow();
+  const filename = `buyer_${bangkokDate(now)}_${bangkokTime(now).replace(":", "")}.csv`; // e.g. buyer_2026-10-05_0947.csv
   // BOM so Excel reads Thai as UTF-8.
   return new Response("﻿" + csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="buyers.csv"',
+      "Content-Disposition": `attachment; filename="${filename}"`,
     },
   });
 }
