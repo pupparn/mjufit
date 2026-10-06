@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MOCK_OUTCOMES } from "@/lib/payments/mock";
-import { SLIP_ACCEPT } from "@/lib/payments/slip-file";
+import { SLIP_ACCEPT, SLIP_MAX_BYTES } from "@/lib/payments/slip-file";
 import { th } from "@/messages/th";
 import { submitSlipAction, type SlipFormState } from "./actions";
 
@@ -16,11 +16,25 @@ export function SlipForm({ orderId, mockMode }: { orderId: string; mockMode: boo
     submitSlipAction.bind(null, orderId),
     initialState,
   );
+  // Files over the server action body limit never reach validateSlipFile, so check size here.
+  const [sizeError, setSizeError] = useState<string | null>(null);
+  const error = sizeError ?? state.error;
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
       <Label htmlFor="slip">{th.order.slipLabel}</Label>
-      <Input id="slip" name="slip" type="file" accept={SLIP_ACCEPT} required />
+      <Input
+        id="slip"
+        name="slip"
+        type="file"
+        accept={SLIP_ACCEPT}
+        required
+        onChange={(e) => {
+          const tooLarge = (e.target.files?.[0]?.size ?? 0) > SLIP_MAX_BYTES;
+          if (tooLarge) e.target.value = "";
+          setSizeError(tooLarge ? th.order.errors.too_large : null);
+        }}
+      />
       <p className="text-xs text-muted-foreground">{th.order.uploadHint}</p>
 
       {mockMode && (
@@ -35,9 +49,9 @@ export function SlipForm({ orderId, mockMode }: { orderId: string; mockMode: boo
         </fieldset>
       )}
 
-      {state.error && (
+      {error && (
         <p role="alert" className="text-sm text-destructive">
-          {state.error}
+          {error}
         </p>
       )}
       <Button type="submit" size="lg" disabled={pending}>
