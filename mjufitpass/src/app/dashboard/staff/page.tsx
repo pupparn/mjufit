@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireSuperAdmin } from "@/lib/auth/viewer";
@@ -13,11 +12,8 @@ export default async function StaffPage() {
   if (error) throw new Error(`load staff: ${error.message}`);
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-8">
-      <Link href="/dashboard" className="text-sm text-muted-foreground">
-        {th.staff.nav.back}
-      </Link>
-      <h1 className="text-2xl font-semibold">{th.staff.admin.staffTitle}</h1>
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 pb-8">
+      <h2 className="text-xl font-semibold">{th.staff.admin.staffTitle}</h2>
       <AddStaffForm />
       <Card>
         <CardHeader>

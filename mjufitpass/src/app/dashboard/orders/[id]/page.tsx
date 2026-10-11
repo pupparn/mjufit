@@ -2,15 +2,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireArea } from "@/lib/auth/viewer";
+import { safeBack } from "@/lib/buyer-filter";
 import { formatBaht } from "@/lib/sales";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { bangkokDate, bangkokTime } from "@/lib/time";
 import { th } from "@/messages/th";
 import { OrderActionsForm } from "./order-actions-form";
 
-export default async function StaffOrderPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function StaffOrderPage({ params, searchParams }: PageProps<"/dashboard/orders/[id]">) {
   await requireArea("staff");
   const { id } = await params;
+  const back = safeBack((await searchParams).back, "/dashboard/buyers?status=needs_review");
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
 
   const db = createAdminClient();
@@ -32,11 +34,11 @@ export default async function StaffOrderPage({ params }: { params: Promise<{ id:
   const refundDue = order.refund_required && !order.refunded_at;
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-8">
-      <Link href="/dashboard/queue" className="text-sm text-muted-foreground">
-        ← {th.staff.queue.title}
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 pb-8">
+      <Link href={back} className="text-sm text-muted-foreground">
+        {th.staff.nav.back}
       </Link>
-      <h1 className="text-2xl font-semibold">{t.title}</h1>
+      <h2 className="text-xl font-semibold">{t.title}</h2>
 
       <Card>
         <CardContent className="flex flex-col gap-1 pt-4 text-sm">
