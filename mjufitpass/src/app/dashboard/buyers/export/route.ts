@@ -1,5 +1,6 @@
 import { getViewer } from "@/lib/auth/viewer";
 import { appNow } from "@/lib/clock";
+import { parseBuyerFilter } from "@/lib/buyer-filter";
 import { loadBuyers } from "@/lib/buyers";
 import { formatBaht } from "@/lib/sales";
 import { toCsv } from "@/lib/stats";
@@ -9,8 +10,8 @@ import { th } from "@/messages/th";
 export async function GET(request: Request) {
   if ((await getViewer()).kind !== "staff") return new Response("Forbidden", { status: 403 });
 
-  const q = (new URL(request.url).searchParams.get("q") ?? "").trim().slice(0, 50);
-  const rows = await loadBuyers(q, 5000);
+  const filter = parseBuyerFilter(Object.fromEntries(new URL(request.url).searchParams));
+  const rows = await loadBuyers(filter, 5000);
   const csv = toCsv([
     [...th.staff.buyers.csvHeader],
     ...rows.map((r) => [

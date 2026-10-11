@@ -66,7 +66,6 @@ export async function orderAction(orderId: string, _prev: OrderActionState, form
     return { error: th.staff.order.errors[known ?? "unknown"] };
   }
 
-  revalidatePath(`/dashboard/orders/${orderId}`);
-  revalidatePath("/dashboard/queue");
+  revalidatePath("/dashboard", "layout"); // order page, lists and the needs-review badge
   return { error: null };
 }
