@@ -128,3 +128,7 @@
     @apply font-sans;
   }
 }
+@keyframes page-loading-bar {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
