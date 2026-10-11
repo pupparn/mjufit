@@ -23,13 +23,13 @@ export function DashboardTabs({ queueCount, superAdmin }: { queueCount: number; 
   ];
 
   return (
-    <nav className="-mx-6 flex gap-1 overflow-x-auto border-b px-6">
+    <nav className="-mx-6 flex gap-1 overflow-x-auto overflow-y-hidden border-b px-6">
       {tabs.map((t) => (
         <Link
           key={t.href}
           href={t.href}
           aria-current={t.active ? "page" : undefined}
-          className={`-mb-px shrink-0 border-b-2 px-3 py-2 text-sm whitespace-nowrap ${
+          className={`shrink-0 border-b-2 px-3 py-2 text-sm whitespace-nowrap ${
             t.active
               ? "border-primary font-medium text-foreground"
               : `border-transparent hover:text-foreground ${t.alert ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"}`
